@@ -13,8 +13,8 @@ from sklearn.model_selection import train_test_split
 
 
 class LR_hue:
-    def __ini__(self):
-        self.trained=False
+    def __init__(self):
+        self.fitted=False
         
     def fit(self, X, y, hue):
         self.hue=hue
@@ -31,13 +31,20 @@ class LR_hue:
             self.dict_lr[hue_feature].fit(xh, yh)
             yhat=self.dict_lr[hue_feature].predict(xh)
             yhatre=np.concatenate((yhatre, yhat))
-
-        self.trained=True    
-        return self.dict_lr
-    
+            
+        print('training accuracy score:', metrics.mean_squared_error(yre,yhatre))
+        print('training r2_score:', metrics.r2_score(yre,yhatre))
+        print('training mean_absolute_error:', metrics.mean_absolute_error(yre,yhatre))   
+        
+        self.fitted=True    
+        #return self.dict_lr
+        
+    def check_fitted(self):
+        if not self.fitted:
+            raise ValueError("NotFittedError")
+            
     def predict(self, X):
-        if not self.trained:
-            raise "NotFittedError"
+        self.check_fitted()
         hue=self.hue
         y=X.copy()[[]]       #create empty y to store predictions keeping the indexes from X
         y['yhat']=np.nan
@@ -46,27 +53,28 @@ class LR_hue:
             pr=self.dict_lr[hue_feature].predict(xh.to_numpy())
             pr=pd.DataFrame(pr, columns=['yhat'], index=xh.index) # store predictions with original x.index used
             y.update(pr) #only update the values in y where indexes from pr matches
-        
         return y['yhat']
     
     def get_params(self):
+        self.check_fitted()
         df_params=pd.DataFrame(columns=['Variable','params'])
         for hue_feature in self.hue_features:
             df_params.loc[len(df_params.index)]=[hue_feature, self.dict_lr[hue_feature].get_params()]
         return df_params
     
     def coef_(self):
+        self.check_fitted()
         df_params=pd.DataFrame(columns=['Variable','coef_'])
         for hue_feature in self.hue_features:
             df_params.loc[len(df_params.index)]=[hue_feature, self.dict_lr[hue_feature].coef_]
         return df_params        
     
     def intercept_(self):
+        self.check_fitted()
         df_params=pd.DataFrame(columns=['Variable','coef_'])
         for hue_feature in self.hue_features:
             df_params.loc[len(df_params.index)]=[hue_feature, self.dict_lr[hue_feature].intercept_]
-        return df_params        
-            
+        return df_params           
 
 df=pd.read_csv('FuelConsumptionCo2.csv')        
 
