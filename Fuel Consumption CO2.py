@@ -74,7 +74,21 @@ class LR_hue:
         df_params=pd.DataFrame(columns=['Variable','coef_'])
         for hue_feature in self.hue_features:
             df_params.loc[len(df_params.index)]=[hue_feature, self.dict_lr[hue_feature].intercept_]
-        return df_params           
+        return df_params     
+
+    def scores(self,X,y):
+        self.check_fitted()
+        y=y.to_frame()
+        hue=self.hue
+        yhat=self.predict(X).to_frame()
+        df_params=pd.DataFrame(columns=[hue,'Accuracy', 'R2', 'MSE', 'MAE'])
+        for hue_feature in self.hue_features:
+            yhath=yhat[X[hue]==hue_feature]
+            yh=y[X[hue]==hue_feature]
+            df_params.loc[len(df_params.index)]=[hue_feature, metrics.mean_squared_error(yh,yhath), metrics.r2_score(yh,yhath), metrics.mean_squared_error(yh,yhath) ,metrics.mean_absolute_error(yh,yhath)]
+        df_params.loc[len(df_params.index)]=['Total', metrics.mean_squared_error(y,yhat), metrics.r2_score(y,yhat), metrics.mean_squared_error(y,yhat) ,metrics.mean_absolute_error(y,yhat)]
+        return df_params        
+
 
 df=pd.read_csv('FuelConsumptionCo2.csv')        
 
