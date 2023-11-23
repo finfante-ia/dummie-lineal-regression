@@ -31,15 +31,6 @@ class LR_hue:
             self.dict_lr[hue_feature].fit(xh, yh)
             yhat=self.dict_lr[hue_feature].predict(xh)
             yhatre=np.concatenate((yhatre, yhat))
-        #     print(hue_feature, 'training accuracy score:', metrics.mean_squared_error(yh,yhat))
-        #     print(hue_feature, 'training r2_score:', metrics.r2_score(yh,yhat))
-        #     print(hue_feature, 'training mean_absolute_error:', metrics.mean_absolute_error(yh,yhat))
-        #     print()
-        
-        
-        # print('training accuracy score:', metrics.mean_squared_error(yre,yhatre))
-        # print('training r2_score:', metrics.r2_score(yre,yhatre))
-        # print('training mean_absolute_error:', metrics.mean_absolute_error(yre,yhatre))
 
         self.trained=True    
         return self.dict_lr
@@ -76,13 +67,8 @@ class LR_hue:
             df_params.loc[len(df_params.index)]=[hue_feature, self.dict_lr[hue_feature].intercept_]
         return df_params        
             
-        
-        
-        
+
 df=pd.read_csv('FuelConsumptionCo2.csv')        
-    
-
-
 
 X=df[['ENGINESIZE', 'CYLINDERS' ,'FUELTYPE', 'FUELCONSUMPTION_CITY','FUELCONSUMPTION_HWY', 'FUELCONSUMPTION_COMB' ,'FUELCONSUMPTION_COMB_MPG']]
 y=df['CO2EMISSIONS']
@@ -98,7 +84,3 @@ y_hat=lr.predict(X_test)
 print('Test accuracy score:', metrics.mean_squared_error(Y_test,y_hat))
 print('Test r2_score:', metrics.r2_score(Y_test,y_hat))
 print('Test mean_absolute_error:', metrics.mean_absolute_error(Y_test,y_hat))
-
-
-
-#coef=lr.coef_()
